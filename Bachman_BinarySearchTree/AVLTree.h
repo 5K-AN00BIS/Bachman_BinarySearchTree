@@ -123,13 +123,29 @@ public:
 		}
 	}
 
-	// BELOW CREATE THE MAXIMUM AND TRAVERSE CLASSES
+	// Print out the maximum key in a list using the private maximum function.
+	void maximum()
+	{
+		std::cout << "The maximum value in the tree is " << maximum(root) << "." << std::endl << std::endl;
+		std::cout << std::endl << std::endl;
+	}
 
 	// Creates the class that prints the tree from the private method using root as an argument. Also skips some lines afterwards.
+	// Print traverses the tree inorder.
 	void print()
 	{
 		print(root);
 		std::cout << std::endl << std::endl;
+	}
+
+	// Check to see if the tree is empty.
+	bool isEmpty()
+	{
+		// If the root is null, tree is empty.
+		if (root == NULL)
+			return true;
+
+		return false; // Tree is not empty.
 	}
 
 private:
@@ -137,10 +153,10 @@ private:
 	Node<T>* root;
 
 	// BEGIN REBALANCING SETUP... ROTATE CLASSES BELOW WILL BE USED IN REBALANCE TO MOVE THINGS SUCCESSFULLY SO IT'S AUTOMATED.
-	// Creates the rotateLeft class that (FILL)
+	// Creates the rotateRight class that will rotate the nodes left until balance has been achieved.
 	Node<T>* rotateLeft(Node<T>* nodeOne)
 	{
-		Node<T>* nodeTwo = nodeOne->right; // Creates a second node and sets it equal to nodeOne.
+		Node<T>* nodeTwo = nodeOne->right; // Creates a second node and sets it equal to nodeOne right.
 		nodeTwo->parent = nodeOne->parent; // Set nodeTwo parent equal to nodeOne parent.
 		nodeOne->right = nodeTwo->left; // Shift the node left.
 
@@ -165,17 +181,18 @@ private:
 			}
 		}
 
+		// Set the balance again for both nodes and return the second node.
 		setBalance(nodeOne);
 		setBalance(nodeTwo);
 		return nodeTwo;
 	}
 
-	// Creates the rotateRight class that (FILL)
+	// Creates the rotateRight class that will rotate the nodes right until balance has been achieved.
 	Node<T>* rotateRight(Node<T>* nodeOne)
 	{
-		Node<T>* nodeTwo = nodeOne->left;
-		nodeTwo->parent = nodeOne->parent;
-		nodeOne->left = nodeTwo->right;
+		Node<T>* nodeTwo = nodeOne->left; // Creates a second node and sets it equal to nodeOne left.
+		nodeTwo->parent = nodeOne->parent; // Set nodeTwo parent equal to nodeOne parent.
+		nodeOne->left = nodeTwo->right; // Shift the node right.
 
 		if (nodeOne->left != NULL)
 		{
@@ -197,6 +214,7 @@ private:
 			}
 		}
 
+		// Set the balance again for both nodes and return the second node.
 		setBalance(nodeOne);
 		setBalance(nodeTwo);
 		return nodeTwo;
@@ -221,8 +239,10 @@ private:
 	// Creates the rebalance class that will rebalance the trees so that it will show correctly, especially after insertion and deletion.
 	void rebalance(Node<T>* node)
 	{
+		// Get the setBalance of the specific node being rebalanced in the argument.
 		setBalance(node);
 
+		// If node balaance is negative 2, rotate right to get the balance needed, otherwise rotate left to right to set the rebalance.
 		if (node->balance == -2)
 		{
 			if (height(node->left->left) >= height(node->left->right))
@@ -234,7 +254,7 @@ private:
 				node = rotateLeftToRight(node);
 			}
 		}
-		else if (node->balance == 2)
+		else if (node->balance == 2) // If node balaance is positive 2, rotate right to get the balance needed, otherwise rotate right to left to set the rebalance.
 		{
 			if (height(node->right->right) >= height(node->right->left))
 			{
@@ -246,6 +266,7 @@ private:
 			}
 		}
 
+		// If the parent is null, rebalance the parent node or set the root to the node being rebalanced, making it the new root with no parent.
 		if (node->parent != NULL)
 		{
 			rebalance(node->parent);
@@ -264,24 +285,55 @@ private:
 			return -1;
 		}
 
+		// Returns the height of the tree so that we can ensure proper balance.
 		return 1 + std::max(height(node->left), height(node->right));
 	}
 
-	// Creates the setBalance class that (FILL)
+	// Creates the setBalance class that holds node balance as the height of right - the height of left so the balancing can be done.
 	void setBalance(Node<T>* node)
 	{
 		node->balance = height(node->right) - height(node->left);
 	}
 
-	// Creates the private print class that (FILL)
+	// Creates the private print class that displays all the values in the existing nodes.
 	void print(Node<T>* node)
 	{
+		// Will only display if the node is not null.
 		if (node != NULL)
 		{
+			// Calls itself to print the node left and right at every interval.
 			print(node->left);
-			std::cout << node->balance << " ";
+			std::cout << node->value << " "; // COUT to print out the key of the node.
 			print(node->right);
 		}
+	}
+
+	// Private maximum so it can be called externally.
+	int maximum(Node<T>* root)
+	{
+		// Base case, if root is empty...
+		if (root == NULL)
+		{
+			return INT_MIN; // Return the minimum int.
+		}
+
+		// Returns 3 separate values.. The data of the root, the max in left subtree and the max in the right.
+		int rootValue = root->value;
+		int leftMax = maximum(root->left);
+		int rightMax = maximum(root->right);
+
+		// If left max is bigger than the valye of root, set new rootValue (can be confusing) to leftMax.
+		if (leftMax > rootValue)
+		{
+			rootValue = leftMax;
+		}
+		// If right max is bigger than the value of root, set new rootValue (can be confusing) to rightMax.
+		if (rightMax > rootValue)
+		{
+			rootValue = rightMax;
+		}
+
+		return rootValue;
 	}
 };
 
